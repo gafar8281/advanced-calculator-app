@@ -1,8 +1,7 @@
-class AdvancedCalculator:
-    def __init__(self) -> None:
-        self.result = 0
-        self.TOLERANCE = 0.000001
+import os
 
+
+class CalculatorEngine:
     def add(self, val1: float, val2: float) -> float:
         return val1 + val2
 
@@ -20,7 +19,7 @@ class AdvancedCalculator:
 
     # --- Advanced Mathematical Functions (Square root, Factorial, Exponents, nth root, Logarithms, Sine function)
 
-    def square_root(self, val: int) -> float:
+    def square_root(self, val: int, tolerance: float = 0.000001) -> float:
         """Implement the Babylonian method."""
         if val < 0:
             raise ValueError("Cannot calculate square root of negative number")
@@ -31,7 +30,7 @@ class AdvancedCalculator:
         while True:
             next_guess: float = 0.5 * (guess + val / guess)
 
-            if abs(next_guess - guess) < self.TOLERANCE:
+            if abs(next_guess - guess) < tolerance:
                 return next_guess
             guess = next_guess
 
@@ -112,127 +111,167 @@ class AdvancedCalculator:
         calculated_percentage: float = (percentage * num) / 100
         return calculated_percentage
 
-    def run(self) -> None:
-        calculator_title = "Python Advanced CLI Calculator"
-        print(calculator_title)
-        print("-" * 40)
+
+class AdvancedCalulator:
+    def __init__(self) -> None:
+        self.engine = CalculatorEngine()
+
+    def clear_screen(self) -> str:
+        cmd = "clear" if os.name == "posix" else "cls"
+        os.system(cmd)
+
+    def display_result(self, output_str) -> None:
         print(
-            "We support different types of calculators:\n \
-               \na) Basic calculator-> +, -, *, / \
-               \nb) Advanced Calculator -> Square root, Factorial, Exponent, nth root, Sine, Logarithm \
-               \nc) Financial Calculator -> EMI calculator, Percentage calculator \
-               \n \nSo, select your desired calculator"
+            f"{'\033[92m'}{'\033[1m'} {output_str} {'\033[0m'}{'\033[92m'}{'\033[0m'}"
         )
-        print("-" * 40)
+        input("\nPress Enter to continue...")
 
+    def run(self) -> None:
         while True:
-            calculator_type = input("\nEnter your calculator type : ")
+            self.clear_screen()
+            print(f"╔{'═' * 58}╗")
+            print(f"║ Python Advanced CLI Calculator{' ' * 27}║")
+            print(f"╚{'═' * 58}╝")
+            print(
+                "\n[1] Basic calculator-> Add, Subtract, Divide, Multiply \
+                \n[2] Advanced Calculator -> Square root, Factorial, Exponent, nth root, Sine, Logarithm \
+                \n[3] Financial Calculator -> EMI calculator, Percentage calculator \
+                \n[Q] Quit \
+                \n "
+            )
+            print("-" * 40)
 
-            if calculator_type in ["quit", "exit"]:
-                print("Exiting calculator. Goodbye!")
+            calculator_type = input("\nSelect mode > ")
+
+            if calculator_type.lower() == "q":
                 break
 
-            calculator_map = {"a": "basic", "b": "advanced", "c": "financial"}
+            if calculator_type == "1":
+                self.basic_operation()
 
-            if calculator_type in calculator_map:
-                if calculator_map[calculator_type] == "basic":
-                    print("\nBasic calculator-> +, -, *, /")
+            elif calculator_type == "2":
+                self.advanced_operation()
 
-                    num1 = float(input("Enter the num 1: "))
-                    operator = input("Enter the operator: ")
-                    num2 = float(input("Enter the num 2: "))
-
-                    if operator == "+":
-                        self.result: float = self.add(num1, num2)
-                    elif operator == "-":
-                        self.result: float = self.subtract(num1, num2)
-                    elif operator == "*":
-                        self.result: float = self.multiply(num1, num2)
-                    elif operator == "/":
-                        self.result: float = self.divide(num1, num2)
-
-                    print(f"\nResult: {num1} {operator} {num2} = {self.result}\n")
-
-                elif calculator_map[calculator_type] == "advanced":
-                    print(
-                        "\nAdvanced Calculator -> \n1. Square root \n2. Factorial \n3. Exponent \
-                           \n4. nth root \n5. Logarithms \n6. Sine value"
-                    )
-
-                    operator = int(input("Enter the operator: "))
-                    adv_opertor_map: dict[int, str] = {
-                        1: "square root",
-                        2: "factorial",
-                        3: "exponent",
-                        4: "nth root",
-                        5: "logarithm",
-                        6: "sine",
-                    }
-                    if operator in {1, 2}:  # square root, factorial
-                        val = float(input("Enter the val: "))
-
-                        if operator == 1:
-                            self.result = self.square_root(val)
-                        else:
-                            self.result = self.factorial(val)
-                        print(
-                            f"\nResult: {adv_opertor_map[operator]}({val}) = {self.result}\n"
-                        )
-
-                    elif operator in {4, 5}:  # nth root, logarithm
-                        x = int(input("Enter the v1: "))
-                        y = int(input("Enter the v2: "))
-
-                        if operator == 4:
-                            self.result = self.nth_root(x, y)
-                        else:
-                            self.result = self.logarithms(x, y)
-                        print(
-                            f"\nResult: {adv_opertor_map[operator]}({x}, {y}) = {self.result}\n"
-                        )
-
-                    elif operator == 3:  # exponent
-                        base = int(input("Enter the base: "))
-                        power = int(input("Enter the power: "))
-
-                        self.result = self.exponents(base, power)
-                        print(
-                            f"\nResult: {adv_opertor_map[operator]}({base}, {power}) = {self.result}\n"
-                        )
-
-                    elif operator == 6:  # sine
-                        x = int(input("Enter the base: "))
-
-                        self.result = self.sine_taylor(x)
-                        print(f"Sin({x}) : {self.result}")
-
-                elif calculator_map[calculator_type] == "financial":
-                    print(
-                        "\nFinancial Calculator -> \n1. EMI calculator \n2. Percentage calculator"
-                    )
-                    operator = int(input("Enter the operator: "))
-
-                    if operator == 1:  # EMI calculator
-                        # loan_amount, ann_interest, duration
-                        loan_amount = int(input("Enter the loan amount : ₹"))
-                        ann_interest = int(input("Enter the annula interest : "))
-                        duration = int(input("Enter the duration : "))
-
-                        self.result = self.emi_calculator(
-                            loan_amount, ann_interest, duration
-                        )
-                        print(f"EMI amount: {self.result}")
-
-                    else:  # percentage calculator
-                        percentage = float(input("Enter the percentage : "))
-                        number = float(input("Enter the num : "))
-                        self.result = self.percentage_calculator(percentage, number)
-                        print(f"{percentage}% of {number} is {self.result}")
+            elif calculator_type == "3":
+                self.financial_operation()
 
             else:
                 print("Give valid option!!!")
 
+    def basic_operation(self) -> None:
+        print(
+            "\nBasic operation => \
+                  \n[1] Add \
+                  \n[2] Subtract \
+                  \n[3] Divide \
+                  \n[4] Multiply"
+        )
+
+        operator = input("\nEnter the operator: ")
+
+        num1 = float(input("Enter the num 1: "))
+        num2 = float(input("Enter the num 2: "))
+
+        result = 0
+        opr = ""
+
+        try:
+            if operator == "1":
+                result, opr = self.engine.add(num1, num2), "+"
+            elif operator == "2":
+                result, opr = self.engine.subtract(num1, num2), "-"
+            elif operator == "3":
+                result, opr = self.engine.divide(num1, num2), "/"
+            elif operator == "4":
+                result, opr = self.engine.multiply(num1, num2), "*"
+
+            output_str = f"\nResult: {num1} {opr} {num2} = {result}\n"
+            self.display_result(output_str)
+
+        except Exception as e:
+            print(f"error : {e}")
+
+    def advanced_operation(self) -> None:
+        print(
+            "\nAdvanced Calculator =>  \
+                \n[1] Square root  \
+                \n[2] Factorial  \
+                \n[3] Exponent \
+                \n[4] nth root  \
+                \n[5] Logarithms \
+                \n[6] Sine value"
+        )
+
+        operator = input("\nEnter the operator: ")
+        result = 0
+        opr = ""
+
+        if operator in {"1", "2"}:  # square root, factorial
+            val = int(input("Enter the val: "))
+
+            if operator == "1":
+                result, opr = self.engine.square_root(val), "sqrt"
+            else:
+                result, opr = self.engine.factorial(val), "fact"
+
+            output_str = f"\nResult: {opr}({val}) = {result}\n"
+            self.display_result(output_str)
+
+        elif operator in {"4", "5"}:  # nth root, logarithm
+            x = int(input("Enter the v1: "))
+            y = int(input("Enter the v2: "))
+
+            if operator == "4":
+                result, opr = self.engine.nth_root(x, y), "nth_root"
+            else:
+                result, opr = self.engine.logarithms(x, y), "log"
+
+            output_str = f"\nResult: {opr}({x}, {y}) = {result}\n"
+            self.display_result(output_str)
+
+        elif operator == "3":  # exponent
+            base = int(input("Enter the base: "))
+            power = int(input("Enter the power: "))
+
+            result = self.engine.exponents(base, power)
+            output_str = f"\nResult: Exponent({base}, {power}) = {result}\n"
+            self.display_result(output_str)
+
+        elif operator == "6":  # sine
+            x = int(input("Enter the base: "))
+            result = self.engine.sine_taylor(x)
+
+            output_str = f"\nResult: Sin({x}) : {result}"
+            self.display_result(output_str)
+
+    def financial_operation(self) -> None:
+        print(
+            "\nFinancial Calculator ->  \
+             \n[1] EMI calculator \
+             \n[2] Percentage calculator"
+        )
+        operator = int(input("\nEnter the operator: "))
+
+        if operator == 1:  # EMI calculator
+            # loan_amount, ann_interest, duration
+            loan_amount = int(input("Enter the loan amount : ₹"))
+            ann_interest = int(input("Enter the annula interest : "))
+            duration = int(input("Enter the duration : "))
+
+            result = self.engine.emi_calculator(loan_amount, ann_interest, duration)
+            output_str = f"\nEMI amount: {result}"
+            self.display_result(output_str)
+
+        else:  # percentage calculator
+            percentage = float(input("Enter the percentage : "))
+            number = float(input("Enter the num : "))
+            result = self.engine.percentage_calculator(percentage, number)
+
+            output_str = f"\n{percentage}% of {number} is {result}"
+            self.display_result(output_str)
+
 
 if __name__ == "__main__":
-    calculator = AdvancedCalculator()
+    calculator = AdvancedCalulator()
     calculator.run()
+    print("\nGoodbye!!!")
